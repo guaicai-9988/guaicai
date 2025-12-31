@@ -21,6 +21,7 @@ POST /api/order/collect/create
 | merchantNumber  | string   | 是   | 商户编号                                   |
 | merchantOrderNo | string   | 是   | 商户订单号，商户系统内唯一                   |
 | amount          | number   | 是   | 订单金额，单位：商户平台货币                 |
+| currencyType    | string   | 是   | 货币类型：cny=人民币，usdt=USDT 等          |
 | networkType     | number   | 是   | 链路类型：1=TRC-20，2=ERC-20，3=BEP-20      |
 | notifyUrl       | string   | 是   | 异步通知地址                               |
 | returnUrl       | string   | 否   | 页面跳转地址（支付完成后跳转）               |
@@ -36,6 +37,7 @@ POST /api/order/collect/create
 | orderNo         | string   | 系统订单号                     |
 | merchantOrderNo | string   | 商户订单号                     |
 | amount          | number   | 订单金额                       |
+| currencyType    | string   | 货币类型                       |
 | payableAmount   | number   | 应付金额（USDT）               |
 | networkType     | number   | 链路类型                       |
 | receiveAddress  | string   | 收款地址                       |
@@ -51,6 +53,7 @@ POST /api/order/collect/create
     "orderNo": "C17356789012341234",
     "merchantOrderNo": "ORDER_20250101_001",
     "amount": 100.00,
+    "currencyType": "cny",
     "payableAmount": 14.285714,
     "networkType": 1,
     "receiveAddress": "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -86,6 +89,7 @@ POST /api/order/collect/query
 | orderNo         | string   | 系统订单号                     |
 | merchantOrderNo | string   | 商户订单号                     |
 | amount          | number   | 订单金额                       |
+| currencyType    | string   | 货币类型                       |
 | payableAmount   | number   | 应付金额（USDT）               |
 | actualAmount    | number   | 实际到账金额（USDT）           |
 | fee             | number   | 手续费（USDT）                 |
@@ -106,6 +110,7 @@ POST /api/order/collect/query
     "orderNo": "C17356789012341234",
     "merchantOrderNo": "ORDER_20250101_001",
     "amount": 100.00,
+    "currencyType": "cny",
     "payableAmount": 14.285714,
     "actualAmount": 14.285714,
     "fee": 0.428571,
@@ -134,7 +139,18 @@ POST /api/order/collect/query
 
 ---
 
-## 四、链路类型说明
+## 四、货币类型说明
+
+| 类型值  | 说明                                    |
+|--------|----------------------------------------|
+| cny    | 人民币                                  |
+| usdt   | USDT                                   |
+
+> 注：具体支持的货币类型以系统数据字典 `currency_type` 配置为准
+
+---
+
+## 五、链路类型说明
 
 | 类型值 | 说明                                    |
 |-------|----------------------------------------|
@@ -144,7 +160,7 @@ POST /api/order/collect/query
 
 ---
 
-## 五、异步通知
+## 六、异步通知
 
 ### 通知地址
 
@@ -185,7 +201,7 @@ POST /api/order/collect/query
 
 ---
 
-## 六、签名算法
+## 七、签名算法
 
 ### 签名规则
 
@@ -202,6 +218,7 @@ POST /api/order/collect/query
 merchantNumber=M123456
 merchantOrderNo=ORDER_001
 amount=100.00
+currencyType=cny
 networkType=1
 notifyUrl=https://example.com/notify
 timestamp=1703555555
@@ -211,12 +228,12 @@ timestamp=1703555555
 
 **Step 1: 按字母排序并拼接**
 ```
-amount=100.00&merchantNumber=M123456&merchantOrderNo=ORDER_001&networkType=1&notifyUrl=https://example.com/notify&timestamp=1703555555
+amount=100.00&currencyType=cny&merchantNumber=M123456&merchantOrderNo=ORDER_001&networkType=1&notifyUrl=https://example.com/notify&timestamp=1703555555
 ```
 
 **Step 2: 追加密钥**
 ```
-amount=100.00&merchantNumber=M123456&merchantOrderNo=ORDER_001&networkType=1&notifyUrl=https://example.com/notify&timestamp=1703555555&key=abcdefghijk123456
+amount=100.00&currencyType=cny&merchantNumber=M123456&merchantOrderNo=ORDER_001&networkType=1&notifyUrl=https://example.com/notify&timestamp=1703555555&key=abcdefghijk123456
 ```
 
 **Step 3: MD5 加密并转大写**
@@ -226,7 +243,7 @@ sign = MD5(上述字符串).toUpperCase()
 
 ---
 
-## 七、代码示例
+## 八、代码示例
 
 ### PHP 示例
 
@@ -240,13 +257,15 @@ class CollectOrderApi
 
     /**
      * 创建代收订单
+     * @param string $currencyType 货币类型：cny, usdt 等
      */
-    public function createOrder($merchantOrderNo, $amount, $networkType, $notifyUrl, $extra = '')
+    public function createOrder($merchantOrderNo, $amount, $currencyType, $networkType, $notifyUrl, $extra = '')
     {
         $params = [
             'merchantNumber' => $this->merchantNumber,
             'merchantOrderNo' => $merchantOrderNo,
             'amount' => $amount,
+            'currencyType' => $currencyType, // 字符串类型：cny, usdt
             'networkType' => $networkType,
             'notifyUrl' => $notifyUrl,
             'extra' => $extra,
@@ -346,6 +365,7 @@ $api = new CollectOrderApi();
 $result = $api->createOrder(
     'ORDER_' . time(),
     100.00,
+    'cny', // 货币类型
     1, // TRC-20
     'https://your-domain.com/notify',
     '附加数据'
@@ -373,13 +393,15 @@ public class CollectOrderApi {
 
     /**
      * 创建代收订单
+     * @param currencyType 货币类型：cny, usdt 等
      */
-    public String createOrder(String merchantOrderNo, double amount, int networkType, 
-                              String notifyUrl, String extra) throws Exception {
+    public String createOrder(String merchantOrderNo, double amount, String currencyType,
+                              int networkType, String notifyUrl, String extra) throws Exception {
         Map<String, Object> params = new TreeMap<>();
         params.put("merchantNumber", merchantNumber);
         params.put("merchantOrderNo", merchantOrderNo);
         params.put("amount", amount);
+        params.put("currencyType", currencyType); // 字符串类型：cny, usdt
         params.put("networkType", networkType);
         params.put("notifyUrl", notifyUrl);
         if (extra != null && !extra.isEmpty()) {
@@ -467,12 +489,14 @@ class CollectOrderApi {
 
     /**
      * 创建代收订单
+     * @param {string} currencyType 货币类型：cny, usdt 等
      */
-    async createOrder(merchantOrderNo, amount, networkType, notifyUrl, extra = '') {
+    async createOrder(merchantOrderNo, amount, currencyType, networkType, notifyUrl, extra = '') {
         const params = {
             merchantNumber: this.merchantNumber,
             merchantOrderNo,
             amount,
+            currencyType, // 字符串类型：cny, usdt
             networkType,
             notifyUrl,
             timestamp: Math.floor(Date.now() / 1000),
@@ -558,6 +582,7 @@ const api = new CollectOrderApi();
 api.createOrder(
     'ORDER_' + Date.now(),
     100.00,
+    'cny', // 货币类型
     1, // TRC-20
     'https://your-domain.com/notify',
     '附加数据'
@@ -597,12 +622,16 @@ class CollectOrderApi:
         self.merchant_number = 'M123456'
         self.merchant_key = 'your_merchant_key'
     
-    def create_order(self, merchant_order_no, amount, network_type, notify_url, extra=''):
-        """创建代收订单"""
+    def create_order(self, merchant_order_no, amount, currency_type, network_type, notify_url, extra=''):
+        """
+        创建代收订单
+        :param currency_type: 货币类型，字符串：cny, usdt 等
+        """
         params = {
             'merchantNumber': self.merchant_number,
             'merchantOrderNo': merchant_order_no,
             'amount': amount,
+            'currencyType': currency_type,  # 字符串类型：cny, usdt
             'networkType': network_type,
             'notifyUrl': notify_url,
             'timestamp': int(time.time()),
@@ -669,6 +698,7 @@ if __name__ == '__main__':
     result = api.create_order(
         f'ORDER_{int(time.time())}',
         100.00,
+        'cny',  # 货币类型
         1,  # TRC-20
         'https://your-domain.com/notify',
         '附加数据'
@@ -705,7 +735,7 @@ def notify():
 
 ---
 
-## 八、业务流程
+## 九、业务流程
 
 ```
 1. 商户系统调用 [创建代收订单] 接口
@@ -729,7 +759,7 @@ def notify():
 
 ---
 
-## 九、常见问题
+## 十、常见问题
 
 ### Q: 收款地址有效期多长？
 
@@ -759,7 +789,7 @@ A: 手续费根据商户费率配置计算。分为固定费用和费率两种�
 
 ---
 
-## 十、错误码说明
+## 十一、错误码说明
 
 | 错误码 | 说明                     |
 |-------|-------------------------|
@@ -776,7 +806,7 @@ A: 手续费根据商户费率配置计算。分为固定费用和费率两种�
 
 ---
 
-## 十一、联系方式
+## 十二、联系方式
 
 如有技术问题，请联系：
 - 技术支持邮箱：tech@example.com
