@@ -25,10 +25,15 @@ POST /api/order/collect/create
 | networkType     | number   | 是   | 链路类型：1=TRC-20，2=ERC-20，3=BEP-20      |
 | notifyUrl       | string   | 是   | 异步通知地址                               |
 | returnUrl       | string   | 否   | 页面跳转地址（支付完成后跳转）               |
-| memberId        | string   | 否   | 商户会员ID                                 |
+| memberId        | string   | 是   | 商户会员ID，每个会员独立分配收款地址          |
 | extra           | string   | 否   | 附加字段，将原样返回                        |
 | timestamp       | number   | 是   | 时间戳（秒）                               |
 | sign            | string   | 是   | 签名                                      |
+
+> **地址分配规则说明：**
+> - 每个商户会员（memberId）会独立分配一个收款地址
+> - 同一会员多次创建订单时，使用相同的收款地址
+> - 系统会自动为新会员创建收款地址，无需预先配置
 
 ### 返回参数
 
@@ -172,8 +177,10 @@ POST /api/order/collect/query
 |-----------------|----------|----------------------------------|
 | merchantNumber  | string   | 商户号                            |
 | orderAmount     | string   | 订单金额（商户提交的原始金额）      |
+| exchangeRate    | string   | 汇率                              |
+| payableAmount   | string   | 应付金额（USDT）                  |
 | actualAmount    | string   | 实际到账金额（USDT）              |
-| fee             | string   | 手续费（USDT）                    |
+| callbackAmount  | string   | 回调金额（商户平台货币）           |
 | merchantOrderNo | string   | 商户订单号                        |
 | orderNo         | string   | 系统订单号                        |
 | status          | number   | 订单状态（2=成功，3=失败）         |
