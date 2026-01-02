@@ -602,8 +602,7 @@ function get_signature($data, $appsecret) {
 ### 6.6 联系方式
 
 如有技术问题，请联系：
-- Telegram: @xxxxx
-- Email: support@xxxxx.com
+- Telegram: @qy6566
 
 ---
 
