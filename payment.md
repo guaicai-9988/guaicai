@@ -223,6 +223,7 @@ $data = [
     'pay_money' => '100.00',
     'chain_type' => 1,
     'notify_url' => 'https://your-domain.com/notify',
+    'pay_username' => 'huoxingzhuangdiqiu',
     'product_name' => '测试商品',
     'timestamp' => time(),
 ];
