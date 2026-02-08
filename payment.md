@@ -176,11 +176,11 @@ def get_signature(data: dict, appsecret: str) -> str:
 | pay_money | 是 | string | 支付金额（USDT） |
 | chain_type | 是 | int | 链类型：1=TRC20，2=ERC20 |
 | notify_url | 是 | string | 异步通知地址 |
+| pay_username | 是| string | 付款用户标识（用于会员独立地址分配） |
 | callback_url | 否 | string | 同步回调地址 |
 | product_name | 否 | string | 商品名称 |
 | product_desc | 否 | string | 商品描述 |
 | product_num | 否 | int | 商品数量 |
-| pay_username | 否 | string | 付款用户标识（用于会员独立地址分配） |
 | attach | 否 | string | 附加数据（原样返回） |
 | timestamp | 是 | int | 时间戳 |
 | signature | 是 | string | 签名 |
