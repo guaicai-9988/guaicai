@@ -212,8 +212,6 @@ def get_signature(data: dict, appsecret: str) -> str:
 |------|------|
 | pay_usdt | 实际需支付的 USDT 金额 |
 | address | 收款地址 |
-| pay_url | 中文支付页面 URL |
-| en_pay_url | 英文支付页面 URL |
 | time_out | 订单超时时间戳 |
 
 **PHP 请求示例：**
