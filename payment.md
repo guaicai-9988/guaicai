@@ -197,7 +197,6 @@ def get_signature(data: dict, appsecret: str) -> str:
         "pay_usdt": 100.00,
         "address": "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "chain_type": 1,
-        "pay_url": "https://域名/payment/index/order/id/M202601010001",
         "en_pay_url": "https://域名/payment/index/en_order/id/M202601010001",
         "exchange_rate": 7.25,
         "time_out": 1735693200,
