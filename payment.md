@@ -604,7 +604,7 @@ function get_signature($data, $appsecret) {
 - Telegram: @xxxxx
 - Email: support@xxxxx.com
 
-```
+---
 
 ---
 
